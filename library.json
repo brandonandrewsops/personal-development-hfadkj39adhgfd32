@@ -1,0 +1,198 @@
+{
+  "version": 1,
+  "base_url": "",
+  "categories": {
+    "Identity": [
+      {
+        "id": "id-1",
+        "text": "I am the Rain Maker.",
+        "audio": "audio/1ae731d35988.mp3"
+      },
+      {
+        "id": "id-2",
+        "text": "I am the Storm Rider.",
+        "audio": "audio/125c531044b5.mp3"
+      },
+      {
+        "id": "id-3",
+        "text": "I am the Resistance Breaker.",
+        "audio": "audio/9d722a45847c.mp3"
+      },
+      {
+        "id": "id-4",
+        "text": "I am the creator.",
+        "audio": "audio/ec5520254620.mp3"
+      },
+      {
+        "id": "id-5",
+        "text": "I am the man I am called to be. I am their hero. If it will be, it's up to me.",
+        "audio": "audio/307054549059.mp3"
+      },
+      {
+        "id": "id-6",
+        "text": "I am becoming the leader I needed in the past, the leader my family needs today, and the leader the world will need tomorrow.",
+        "audio": "audio/33a4b2101789.mp3"
+      },
+      {
+        "id": "id-7",
+        "text": "I am wise. I am in control. I am abundance. I am energy. I am wealthy. I am free.",
+        "audio": "audio/cb74d957a8cc.mp3"
+      },
+      {
+        "id": "id-8",
+        "text": "I am the man that finds a way to make it happen.",
+        "audio": "audio/40ac870c3b98.mp3"
+      }
+    ],
+    "Why": [
+      {
+        "id": "id-10",
+        "text": "I am here to give my children the greatest opportunity to express their highest capabilities and to pursue their dreams.",
+        "audio": "audio/efb421cb6a5d.mp3"
+      },
+      {
+        "id": "id-11",
+        "text": "My dreams must be big enough for everyone to fit inside.",
+        "audio": "audio/909bf4cab987.mp3"
+      },
+      {
+        "id": "id-12",
+        "text": "I create the man that I admire in every way, and I give that man to the world.",
+        "audio": "audio/d2e942a32b14.mp3"
+      },
+      {
+        "id": "id-13",
+        "text": "I am here to inspire, activate, educate, and liberate myself and others to create great value honorably.",
+        "audio": "audio/6e319301dc34.mp3"
+      },
+      {
+        "id": "id-14",
+        "text": "I want to fix the food, the finances, and the education. I want to create more warm households.",
+        "audio": "audio/67683a2fac1a.mp3"
+      },
+      {
+        "id": "id-15",
+        "text": "Be the man I needed back then. Be the man my family needs now. Become the man the world needs tomorrow.",
+        "audio": "audio/7d91044de7e0.mp3"
+      }
+    ],
+    "Standards": [
+      {
+        "id": "id-20",
+        "text": "I care about the goal more than I care about my feelings.",
+        "audio": "audio/cbc21646ddf0.mp3"
+      },
+      {
+        "id": "id-21",
+        "text": "Commitment is eliminating all other alternatives.",
+        "audio": "audio/9c44ceb1a4bf.mp3"
+      },
+      {
+        "id": "id-22",
+        "text": "Focus is the amount of stuff I say no to.",
+        "audio": "audio/8f1535e36cb5.mp3"
+      },
+      {
+        "id": "id-23",
+        "text": "It's not the gap. It's the gain.",
+        "audio": "audio/d13fe9ba9ce2.mp3"
+      },
+      {
+        "id": "id-24",
+        "text": "I treat every interaction as if I paid ten thousand dollars to meet with them.",
+        "audio": "audio/bbe0dffb6787.mp3"
+      },
+      {
+        "id": "id-25",
+        "text": "As a leader, my weakness is their way out. I live with strength and intention and purpose.",
+        "audio": "audio/b233cfa5be06.mp3"
+      }
+    ],
+    "Pain Fuel": [
+      {
+        "id": "id-30",
+        "text": "I remember the night Alexis got hurt and I had no car to go to her. Never again.",
+        "audio": "audio/93e493cdea2a.mp3"
+      },
+      {
+        "id": "id-31",
+        "text": "I remember the mold. We couldn't move, we couldn't replace anything. Never again.",
+        "audio": "audio/a383bbdc83de.mp3"
+      },
+      {
+        "id": "id-32",
+        "text": "My mother is done paying for dinner. I pay for the rest of her life.",
+        "audio": "audio/23d8a7ce841f.mp3"
+      },
+      {
+        "id": "id-33",
+        "text": "One of the most insidious forms of child neglect is a parent who doesn't chase their dreams. I chase mine.",
+        "audio": "audio/8a104b8f5209.mp3"
+      },
+      {
+        "id": "id-34",
+        "text": "I am not in a state of need. I am in a state of must.",
+        "audio": "audio/99567ee88660.mp3"
+      }
+    ],
+    "Vision": [
+      {
+        "id": "id-40",
+        "text": "A sunset view from my kitchen. Dance parties with my kids every night.",
+        "audio": "audio/358a4a448d7e.mp3"
+      },
+      {
+        "id": "id-41",
+        "text": "The freedom to book a flight tomorrow with nothing holding us back.",
+        "audio": "audio/8d4d42f77daf.mp3"
+      },
+      {
+        "id": "id-42",
+        "text": "A home so big my grandchildren always vote to come to my place for the holidays.",
+        "audio": "audio/0e572e05f375.mp3"
+      },
+      {
+        "id": "id-43",
+        "text": "Driving through the mountains with my family, the windows down, Michael Jackson on the speakers.",
+        "audio": "audio/6564c3a56b8a.mp3"
+      },
+      {
+        "id": "id-44",
+        "text": "Watching my children become the ultimate expression of their highest capabilities.",
+        "audio": "audio/21df03e0246c.mp3"
+      }
+    ],
+    "Priming": [
+      {
+        "id": "id-50",
+        "text": "What am I happy about in my life right now? What about it makes me happy? And how does that make me feel?",
+        "audio": "audio/c307fd495bdc.mp3"
+      },
+      {
+        "id": "id-51",
+        "text": "What am I excited about in my life right now? What about it makes me excited? And how does that make me feel?",
+        "audio": "audio/241498287920.mp3"
+      },
+      {
+        "id": "id-52",
+        "text": "What am I proud of in my life right now? What about it makes me proud? And how does that make me feel?",
+        "audio": "audio/f9d8bacfec8d.mp3"
+      },
+      {
+        "id": "id-53",
+        "text": "What am I grateful for in my life right now? What about it makes me grateful? And how does that make me feel?",
+        "audio": "audio/97bbd738d081.mp3"
+      },
+      {
+        "id": "id-54",
+        "text": "What am I committed to in my life right now? And how does that make me feel?",
+        "audio": "audio/7526127e2f90.mp3"
+      },
+      {
+        "id": "id-55",
+        "text": "Who do I love? Who loves me? And how does that make me feel?",
+        "audio": "audio/6a79e528dc40.mp3"
+      }
+    ]
+  }
+}
