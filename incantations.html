@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Incantations">
+  <title>Incantations</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+    body {
+      background: #0a0a0a;
+      color: #f5f1e8;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      overscroll-behavior: none;
+      -webkit-font-smoothing: antialiased;
+    }
+    #app {
+      max-width: 600px;
+      margin: 0 auto;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* HEADER */
+    header {
+      padding: 18px 20px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      border-bottom: 1px solid rgba(245,241,232,0.08);
+    }
+    header .brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    header .brand .accent { color: #d4a574; font-style: italic; }
+    header .actions { display: flex; gap: 8px; }
+    .icon-btn {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      border: 1px solid rgba(245,241,232,0.12);
+      background: rgba(245,241,232,0.03);
+      color: #f5f1e8;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      padding: 0;
+    }
+    .icon-btn:active { transform: scale(0.92); background: rgba(245,241,232,0.1); }
+    .icon-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.6; }
+    .icon-btn.dot::after {
+      content: ''; position: absolute; width: 7px; height: 7px;
+      border-radius: 50%; top: 6px; right: 6px;
+    }
+    .icon-btn.dot.ok::after { background: #6db77f; }
+    .icon-btn.dot.err::after { background: #c95757; }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      padding: 14px 20px 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex-shrink: 0;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab {
+      padding: 8px 16px;
+      border-radius: 100px;
+      border: 1px solid rgba(245,241,232,0.12);
+      background: transparent;
+      color: rgba(245,241,232,0.65);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      letter-spacing: 0.02em;
+    }
+    .tab.active {
+      background: #d4a574;
+      color: #0a0a0a;
+      border-color: #d4a574;
+    }
+    .tab:active { transform: scale(0.96); }
+    .tab.starred { display: flex; align-items: center; gap: 5px; }
+    .tab.starred svg { width: 11px; height: 11px; }
+
+    /* MAIN */
+    main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 20px 30px;
+      -webkit-overflow-scrolling: touch;
+    }
+    main::-webkit-scrollbar { display: none; }
+
+    /* NOW PLAYING */
+    .now-playing {
+      margin-top: 20px;
+      padding: 28px 24px;
+      border-radius: 22px;
+      background: linear-gradient(155deg, rgba(212,165,116,0.08) 0%, rgba(245,241,232,0.02) 60%);
+      border: 1px solid rgba(245,241,232,0.08);
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+    .now-playing::before {
+      content: '';
+      position: absolute;
+      top: -50%; right: -30%;
+      width: 80%; height: 200%;
+      background: radial-gradient(circle, rgba(212,165,116,0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      position: relative;
+      z-index: 1;
+    }
+    .meta-label {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #d4a574;
+      font-weight: 600;
+    }
+    .meta-controls { display: flex; gap: 6px; align-items: center; }
+    .voice-tag {
+      font-size: 9px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(109,183,127,0.15);
+      color: #6db77f;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 600;
+      border: 1px solid rgba(109,183,127,0.25);
+    }
+    .star-btn {
+      background: none; border: none; cursor: pointer; padding: 4px;
+      color: rgba(245,241,232,0.3);
+      transition: color 0.15s ease;
+    }
+    .star-btn.active { color: #d4a574; }
+    .star-btn svg { width: 18px; height: 18px; stroke: currentColor; }
+    .star-btn.active svg { fill: #d4a574; }
+
+    .text-line {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 500;
+      line-height: 1.35;
+      color: #f5f1e8;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* TRANSPORT */
+    .transport {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 18px;
+      margin: 28px 0 22px;
+    }
+    .transport-btn {
+      width: 44px; height: 44px;
+      background: transparent;
+      border: none;
+      color: rgba(245,241,232,0.6);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+      transition: all 0.15s ease;
+    }
+    .transport-btn:active { transform: scale(0.92); }
+    .transport-btn.toggled { color: #d4a574; }
+    .transport-btn:disabled { opacity: 0.3; }
+    .transport-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+    .play-btn {
+      width: 64px; height: 64px;
+      background: #d4a574;
+      color: #0a0a0a;
+      box-shadow: 0 8px 24px rgba(212,165,116,0.3);
+    }
+    .play-btn:hover { background: #e0b585; }
+    .play-btn svg { width: 26px; height: 26px; fill: currentColor; stroke: none; }
+
+    /* LIST */
+    .list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 8px 0 12px;
+      padding-top: 8px;
+    }
+    .list-header h2 {
+      margin: 0;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(245,241,232,0.5);
+      font-weight: 600;
+    }
+    .list-header .add-btn {
+      background: none; border: none; cursor: pointer;
+      color: #d4a574;
+      font-size: 12px;
+      font-family: inherit;
+      font-weight: 500;
+      display: flex; align-items: center; gap: 4px;
+      padding: 4px 8px;
+    }
+    .item {
+      display: flex;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.12s ease;
+      align-items: flex-start;
+      margin-bottom: 4px;
+      border: 1px solid transparent;
+    }
+    .item:active { background: rgba(245,241,232,0.06); }
+    .item.current {
+      background: rgba(212,165,116,0.08);
+      border-color: rgba(212,165,116,0.2);
+    }
+    .item-num {
+      flex-shrink: 0;
+      font-size: 11px;
+      color: rgba(245,241,232,0.4);
+      font-variant-numeric: tabular-nums;
+      padding-top: 3px;
+      width: 22px;
+    }
+    .item-content { flex: 1; min-width: 0; }
+    .item-cat {
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(245,241,232,0.4);
+      margin-bottom: 2px;
+    }
+    .item-text {
+      font-size: 14px;
+      line-height: 1.45;
+      color: rgba(245,241,232,0.85);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 16px;
+    }
+    .item-icons {
+      flex-shrink: 0;
+      display: flex; align-items: center; gap: 4px;
+      padding-top: 4px;
+    }
+    .has-audio-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: #6db77f;
+    }
+
+    /* MODALS */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(10,10,10,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 100;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal {
+      width: 100%;
+      max-width: 600px;
+      background: #141414;
+      border-top: 1px solid rgba(245,241,232,0.1);
+      border-radius: 22px 22px 0 0;
+      padding: 22px 22px 28px;
+      max-height: 85vh;
+      overflow-y: auto;
+      animation: slideUp 0.25s ease;
+    }
+    @media (min-width: 600px) {
+      .modal-backdrop { align-items: center; }
+      .modal { border-radius: 22px; max-width: 480px; }
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .modal-header h3 {
+      margin: 0;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 500;
+    }
+    .close-btn {
+      background: none; border: none; cursor: pointer;
+      color: rgba(245,241,232,0.6);
+      padding: 4px;
+    }
+    .close-btn svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(245,241,232,0.5);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .field input[type="text"], .field input[type="password"], .field textarea, .field select {
+      width: 100%;
+      background: rgba(245,241,232,0.04);
+      border: 1px solid rgba(245,241,232,0.1);
+      border-radius: 10px;
+      padding: 11px 14px;
+      color: #f5f1e8;
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+    .field input:focus, .field textarea:focus, .field select:focus {
+      border-color: #d4a574;
+    }
+    .field textarea {
+      min-height: 100px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 17px;
+      resize: vertical;
+    }
+    .field-help {
+      font-size: 11px;
+      color: rgba(245,241,232,0.4);
+      margin-top: 5px;
+    }
+    .field-row {
+      display: flex; gap: 10px; align-items: center;
+      font-size: 13px;
+      color: rgba(245,241,232,0.8);
+      cursor: pointer;
+    }
+    .field input[type="range"] {
+      width: 100%;
+      accent-color: #d4a574;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      background: #d4a574;
+      color: #0a0a0a;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      transition: all 0.15s ease;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn.secondary {
+      background: rgba(245,241,232,0.06);
+      color: #f5f1e8;
+      border: 1px solid rgba(245,241,232,0.1);
+    }
+    .btn.success { background: #6db77f; }
+    .btn.error { background: #c95757; color: #f5f1e8; }
+    .btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+    /* SETUP CARD */
+    .setup-card {
+      margin-top: 16px;
+      padding: 14px 16px;
+      background: rgba(212,165,116,0.06);
+      border: 1px solid rgba(212,165,116,0.18);
+      border-radius: 12px;
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .setup-card svg { width: 18px; height: 18px; flex-shrink: 0; color: #d4a574; margin-top: 2px; }
+    .setup-card-content { flex: 1; }
+    .setup-card-content p { margin: 0 0 4px; font-size: 13px; }
+    .setup-card-content p.title { font-weight: 600; color: #d4a574; }
+    .setup-card-content p.body { color: rgba(245,241,232,0.65); font-size: 12px; line-height: 1.4; }
+    .setup-card-content button {
+      margin-top: 8px;
+      padding: 6px 12px;
+      background: #d4a574;
+      color: #0a0a0a;
+      border: none;
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* NOW PLAYING INDICATOR */
+    .now-playing-indicator {
+      position: fixed;
+      bottom: max(20px, env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(212,165,116,0.95);
+      color: #0a0a0a;
+      padding: 8px 16px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      z-index: 50;
+    }
+    .now-playing-indicator.show { display: flex; }
+    .now-playing-indicator .pulse {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #0a0a0a;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; transform: scale(0.85); }
+      50% { opacity: 1; transform: scale(1); }
+    }
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: rgba(245,241,232,0.4);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="brand">incantations<span class="accent">.</span></div>
+    <div class="actions">
+      <button class="icon-btn" id="syncBtn" title="Sync"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></button>
+      <button class="icon-btn" id="settingsBtn" title="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+    </div>
+  </header>
+  <main id="main"></main>
+  <div class="now-playing-indicator" id="playingIndicator"><span class="pulse"></span>Playing</div>
+</div>
+
+<!-- Modals are appended here -->
+<div id="modals"></div>
+
+<script>
+'use strict';
+
+// =========================================================================
+// CONFIG
+// =========================================================================
+const APP_VERSION = '1.0.0';
+const AUDIO_CACHE = 'incantations-audio-v1';
+
+const SEED_LIBRARY = {
+  version: 1,
+  base_url: '',
+  categories: {
+    "Identity": [
+      { id: "seed-1", text: "I am the Rain Maker." },
+      { id: "seed-2", text: "I am a world builder. I am a dream builder. I am the creator." },
+      { id: "seed-3", text: "I am becoming the leader I needed in the past, the leader my family needs today, and the leader the world will need tomorrow." },
+      { id: "seed-4", text: "I am the man I am called to be. I am their hero. If it will be, it's up to me." },
+    ],
+    "Why": [
+      { id: "seed-10", text: "I am here to give my children the greatest opportunity to express their highest capabilities and to pursue their dreams." },
+      { id: "seed-11", text: "My dreams must be big enough for everyone to fit inside." },
+      { id: "seed-12", text: "I create the man that I admire in every way, and I give that man to the world." },
+    ],
+    "Standards": [
+      { id: "seed-20", text: "I care about the goal more than I care about my feelings." },
+      { id: "seed-21", text: "Commitment is eliminating all other alternatives." },
+      { id: "seed-22", text: "Focus is the amount of stuff I say no to." },
+      { id: "seed-23", text: "It's not the gap, it's the gain." },
+    ],
+    "Pain Fuel": [
+      { id: "seed-30", text: "I remember the feeling of being powerless when my wife got injured and I had no car to go to her. Never again." },
+      { id: "seed-31", text: "I remember my mother paying for dinner. That was the last time. I pay for the rest of her life." },
+      { id: "seed-32", text: "One of the most insidious forms of child neglect is a parent who doesn't chase their dreams. I chase mine." },
+    ],
+    "Priming": [
+      { id: "seed-50", text: "What am I grateful for in my life right now? And how does that make me feel?" },
+      { id: "seed-51", text: "What am I excited about in my life right now? And how does that make me feel?" },
+      { id: "seed-52", text: "What am I proud of in my life right now? And how does that make me feel?" },
+      { id: "seed-53", text: "Who do I love? Who loves me? And how does that make me feel?" },
+    ],
+  }
+};
+
+// =========================================================================
+// STATE
+// =========================================================================
+const ls = {
+  get: (k) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch { return null; } },
+  set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+
+const state = {
+  library: ls.get('lib') || SEED_LIBRARY,
+  favorites: new Set(ls.get('favs') || []),
+  config: ls.get('config') || { libraryUrl: '', autoSync: false },
+  settings: ls.get('settings') || { rate: 0.95, pauseBetween: 1.5, voiceURI: null },
+  view: 'category',         // 'category' or 'starred'
+  activeCategory: null,
+  currentIdx: 0,
+  isPlaying: false,
+  shuffle: false,
+  loop: true,
+  voices: [],
+  syncStatus: '',           // '', 'syncing', 'success', 'error'
+  syncError: '',
+  lastSync: ls.get('lastSync') || null,
+};
+
+// Audio state
+let audioElement = null;
+let advanceTimer = null;
+let currentBlobUrl = null;
+
+function persist() {
+  ls.set('lib', state.library);
+  ls.set('favs', [...state.favorites]);
+  ls.set('config', state.config);
+  ls.set('settings', state.settings);
+  ls.set('lastSync', state.lastSync);
+}
+
+// =========================================================================
+// LIBRARY HELPERS
+// =========================================================================
+function getCategories() { return Object.keys(state.library.categories || {}); }
+
+function getStarredItems() {
+  const out = [];
+  for (const [cat, items] of Object.entries(state.library.categories || {})) {
+    for (const item of items) {
+      if (state.favorites.has(item.id)) {
+        out.push({ ...item, _category: cat });
+      }
+    }
+  }
+  return out;
+}
+
+function getCurrentList() {
+  if (state.view === 'starred') return getStarredItems();
+  return state.library.categories[state.activeCategory] || [];
+}
+
+function getCurrentItem() {
+  const list = getCurrentList();
+  return list[state.currentIdx];
+}
+
+function resolveAudioUrl(item) {
+  if (!item || !item.audio) return null;
+  if (item.audio.startsWith('http://') || item.audio.startsWith('https://')) return item.audio;
+  // Resolve relative to base_url from library, fallback to libraryUrl base
+  const base = state.library.base_url || deriveBaseFromLibraryUrl();
+  if (!base) return null;
+  return base.replace(/\/$/, '') + '/' + item.audio.replace(/^\//, '');
+}
+
+function deriveBaseFromLibraryUrl() {
+  // Strip the filename off libraryUrl if present
+  if (!state.config.libraryUrl) return '';
+  const u = state.config.libraryUrl;
+  const idx = u.lastIndexOf('/');
+  return idx > 0 ? u.slice(0, idx) : u;
+}
+
+// =========================================================================
+// SYNC
+// =========================================================================
+async function syncFromUrl() {
+  if (!state.config.libraryUrl) { openConfig(); return; }
+  state.syncStatus = 'syncing';
+  state.syncError = '';
+  render();
+  try {
+    const res = await fetch(state.config.libraryUrl, { cache: 'no-cache' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!data.categories) throw new Error('Invalid library format (missing "categories")');
+
+    // Merge: keep local-* items, replace everything else from remote
+    const merged = { ...data, categories: {} };
+    const allCats = new Set([
+      ...Object.keys(data.categories),
+      ...Object.keys(state.library.categories || {})
+    ]);
+    for (const cat of allCats) {
+      const remoteItems = data.categories[cat] || [];
+      const localItems = (state.library.categories?.[cat] || [])
+        .filter(i => i.id?.startsWith('local-'));
+      const combined = [...remoteItems, ...localItems];
+      if (combined.length) merged.categories[cat] = combined;
+    }
+
+    state.library = merged;
+    state.lastSync = new Date().toISOString();
+    state.syncStatus = 'success';
+    persist();
+    render();
+    setTimeout(() => { state.syncStatus = ''; render(); }, 2500);
+  } catch (e) {
+    console.error('sync failed', e);
+    state.syncError = e.message;
+    state.syncStatus = 'error';
+    render();
+    setTimeout(() => { state.syncStatus = ''; render(); }, 4000);
+  }
+}
+
+// =========================================================================
+// AUDIO CACHE
+// =========================================================================
+async function fetchAudioBlobUrl(audioUrl) {
+  // Try Cache API first
+  try {
+    if ('caches' in window) {
+      const cache = await caches.open(AUDIO_CACHE);
+      const cached = await cache.match(audioUrl);
+      if (cached) {
+        const blob = await cached.blob();
+        return URL.createObjectURL(blob);
+      }
+    }
+  } catch (e) { /* fall through */ }
+
+  // Fetch fresh
+  const res = await fetch(audioUrl);
+  if (!res.ok) throw new Error('audio fetch ' + res.status);
+
+  // Cache for next time
+  try {
+    if ('caches' in window) {
+      const c = await caches.open(AUDIO_CACHE);
+      await c.put(audioUrl, res.clone());
+    }
+  } catch (e) { /* non-fatal */ }
+
+  const blob = await res.blob();
+  return URL.createObjectURL(blob);
+}
+
+async function clearAudioCache() {
+  try { await caches.delete(AUDIO_CACHE); } catch {}
+  alert('Audio cache cleared. Items will re-download on next play.');
+}
+
+// =========================================================================
+// PLAYBACK
+// =========================================================================
+function stopPlayback() {
+  try { window.speechSynthesis.cancel(); } catch {}
+  if (audioElement) {
+    try {
+      audioElement.pause();
+      audioElement.removeAttribute('src');
+      audioElement.load();
+    } catch {}
+    audioElement = null;
+  }
+  if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = null; }
+  if (currentBlobUrl) { URL.revokeObjectURL(currentBlobUrl); currentBlobUrl = null; }
+}
+
+function nextIndex() {
+  const list = getCurrentList();
+  if (!list.length) return -1;
+  if (state.shuffle) return Math.floor(Math.random() * list.length);
+  if (state.currentIdx + 1 >= list.length) return state.loop ? 0 : -1;
+  return state.currentIdx + 1;
+}
+
+function speakWithTTS(text, onDone) {
+  if (!('speechSynthesis' in window)) { onDone(); return; }
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = state.settings.rate;
+  const v = state.voices.find(x => x.voiceURI === state.settings.voiceURI);
+  if (v) u.voice = v;
+  u.onend = onDone;
+  u.onerror = onDone;
+  window.speechSynthesis.speak(u);
+}
+
+async function playCurrent() {
+  stopPlayback();
+  const item = getCurrentItem();
+  if (!item) return;
+
+  const onDone = () => {
+    const next = nextIndex();
+    if (next === -1) {
+      state.isPlaying = false;
+      render();
+      return;
+    }
+    advanceTimer = setTimeout(() => {
+      state.currentIdx = next;
+      render();
+      playCurrent();
+    }, state.settings.pauseBetween * 1000);
+  };
+
+  // MediaSession metadata for lock-screen
+  if ('mediaSession' in navigator) {
+    try {
+      navigator.mediaSession.metadata = new window.MediaMetadata({
+        title: item.text.length > 100 ? item.text.slice(0, 100) + '…' : item.text,
+        artist: 'Incantations',
+        album: item._category || state.activeCategory || '',
+      });
+      navigator.mediaSession.playbackState = 'playing';
+    } catch {}
+  }
+
+  const audioUrl = resolveAudioUrl(item);
+  if (audioUrl) {
+    try {
+      const blobUrl = await fetchAudioBlobUrl(audioUrl);
+      currentBlobUrl = blobUrl;
+      audioElement = new Audio(blobUrl);
+      audioElement.playbackRate = state.settings.rate;
+      audioElement.onended = onDone;
+      audioElement.onerror = (e) => {
+        console.warn('audio playback error, falling back to TTS', e);
+        speakWithTTS(item.text, onDone);
+      };
+      await audioElement.play();
+      return;
+    } catch (e) {
+      console.warn('audio fetch failed, falling back to TTS', e);
+    }
+  }
+  speakWithTTS(item.text, onDone);
+}
+
+function togglePlay() {
+  if (state.isPlaying) {
+    state.isPlaying = false;
+    stopPlayback();
+    if ('mediaSession' in navigator) {
+      try { navigator.mediaSession.playbackState = 'paused'; } catch {}
+    }
+    render();
+  } else {
+    if (!getCurrentList().length) return;
+    state.isPlaying = true;
+    render();
+    playCurrent();
+  }
+}
+
+function goNext() {
+  const n = nextIndex();
+  if (n === -1) return;
+  state.currentIdx = n;
+  render();
+  if (state.isPlaying) playCurrent();
+}
+
+function goPrev() {
+  const list = getCurrentList();
+  if (!list.length) return;
+  state.currentIdx = (state.currentIdx - 1 + list.length) % list.length;
+  render();
+  if (state.isPlaying) playCurrent();
+}
+
+function setupMediaSessionHandlers() {
+  if (!('mediaSession' in navigator)) return;
+  try {
+    navigator.mediaSession.setActionHandler('play', () => {
+      if (!state.isPlaying) togglePlay();
+    });
+    navigator.mediaSession.setActionHandler('pause', () => {
+      if (state.isPlaying) togglePlay();
+    });
+    navigator.mediaSession.setActionHandler('nexttrack', goNext);
+    navigator.mediaSession.setActionHandler('previoustrack', goPrev);
+  } catch {}
+}
+
+// =========================================================================
+// USER ACTIONS
+// =========================================================================
+function selectCategory(cat) {
+  state.view = 'category';
+  state.activeCategory = cat;
+  state.currentIdx = 0;
+  render();
+  if (state.isPlaying) playCurrent();
+}
+
+function selectStarred() {
+  state.view = 'starred';
+  state.currentIdx = 0;
+  render();
+  if (state.isPlaying) playCurrent();
+}
+
+function selectIndex(i) {
+  state.currentIdx = i;
+  render();
+  if (state.isPlaying) playCurrent();
+}
+
+function toggleFav(id) {
+  if (!id) return;
+  if (state.favorites.has(id)) state.favorites.delete(id);
+  else state.favorites.add(id);
+  persist();
+  render();
+}
+
+function addLocalItem(category, text) {
+  if (!text.trim()) return;
+  const id = 'local-' + Date.now();
+  state.library.categories[category] = state.library.categories[category] || [];
+  state.library.categories[category].push({ id, text: text.trim() });
+  persist();
+  render();
+}
+
+function deleteItem(category, id) {
+  state.library.categories[category] = (state.library.categories[category] || [])
+    .filter(i => i.id !== id);
+  state.favorites.delete(id);
+  if (state.currentIdx >= (state.library.categories[category]?.length || 0)) {
+    state.currentIdx = 0;
+  }
+  persist();
+  render();
+}
+
+// =========================================================================
+// RENDERING
+// =========================================================================
+const $ = (id) => document.getElementById(id);
+
+function render() {
+  renderHeader();
+  renderMain();
+}
+
+function renderHeader() {
+  const syncBtn = $('syncBtn');
+  syncBtn.classList.toggle('dot', state.syncStatus === 'success' || state.syncStatus === 'error');
+  syncBtn.classList.toggle('ok', state.syncStatus === 'success');
+  syncBtn.classList.toggle('err', state.syncStatus === 'error');
+  syncBtn.style.position = 'relative';
+  if (state.syncStatus === 'syncing') {
+    syncBtn.style.animation = 'spin 1s linear infinite';
+  } else {
+    syncBtn.style.animation = '';
+  }
+  $('playingIndicator').classList.toggle('show', state.isPlaying);
+}
+
+function renderMain() {
+  const main = $('main');
+  const cats = getCategories();
+  const list = getCurrentList();
+  const item = getCurrentItem();
+  const starredCount = getStarredItems().length;
+  const showSetup = !state.config.libraryUrl;
+
+  let html = '';
+
+  if (showSetup) {
+    html += `
+      <div class="setup-card">
+        <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div class="setup-card-content">
+          <p class="title">Connect your library</p>
+          <p class="body">Right now you're hearing fallback TTS. Connect to your hosted library to play audio in your voice.</p>
+          <button onclick="openConfig()">Connect</button>
+        </div>
+      </div>`;
+  }
+
+  // Tabs
+  html += '<div class="tabs">';
+  html += `<button class="tab starred ${state.view === 'starred' ? 'active' : ''}" onclick="selectStarred()">
+    <svg viewBox="0 0 24 24" fill="${state.view === 'starred' ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    Starred (${starredCount})
+  </button>`;
+  for (const cat of cats) {
+    const active = state.view === 'category' && state.activeCategory === cat;
+    html += `<button class="tab ${active ? 'active' : ''}" onclick="selectCategory('${escapeAttr(cat)}')">${escapeHtml(cat)}</button>`;
+  }
+  html += '</div>';
+
+  // Now playing card
+  const totalCount = list.length;
+  const currentNum = totalCount > 0 ? state.currentIdx + 1 : 0;
+  const itemHasAudio = item && resolveAudioUrl(item);
+  const isFav = item && state.favorites.has(item.id);
+  const labelText = state.view === 'starred' ? 'Starred' : (state.activeCategory || '');
+
+  html += `<div class="now-playing">
+    <div class="meta-row">
+      <span class="meta-label">${escapeHtml(labelText)} · ${currentNum}/${totalCount}</span>
+      <div class="meta-controls">
+        ${itemHasAudio ? '<span class="voice-tag">your voice</span>' : ''}
+        ${item ? `<button class="star-btn ${isFav ? 'active' : ''}" onclick="toggleFav('${escapeAttr(item.id)}')">
+          <svg viewBox="0 0 24 24" fill="${isFav ? 'currentColor' : 'none'}" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </button>` : ''}
+      </div>
+    </div>
+    <div class="text-line">${item ? escapeHtml(item.text) : (state.view === 'starred' ? 'No starred items yet — tap the star on any line to save it here.' : 'No items in this category.')}</div>
+  </div>`;
+
+  // Transport
+  const canPlay = list.length > 0;
+  html += `<div class="transport">
+    <button class="transport-btn ${state.shuffle ? 'toggled' : ''}" onclick="toggleShuffle()" aria-label="Shuffle">
+      <svg viewBox="0 0 24 24"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+    </button>
+    <button class="transport-btn" onclick="goPrev()" ${canPlay ? '' : 'disabled'} aria-label="Previous">
+      <svg viewBox="0 0 24 24"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/></svg>
+    </button>
+    <button class="transport-btn play-btn" onclick="togglePlay()" ${canPlay ? '' : 'disabled'} aria-label="Play/Pause">
+      ${state.isPlaying
+        ? '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>'
+        : '<svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>'}
+    </button>
+    <button class="transport-btn" onclick="goNext()" ${canPlay ? '' : 'disabled'} aria-label="Next">
+      <svg viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+    </button>
+    <button class="transport-btn ${state.loop ? 'toggled' : ''}" onclick="toggleLoop()" aria-label="Loop">
+      <svg viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+    </button>
+  </div>`;
+
+  // List
+  html += `<div class="list-header">
+    <h2>${state.view === 'starred' ? 'All starred' : 'All in ' + escapeHtml(state.activeCategory || '')}</h2>
+    ${state.view === 'category' ? `<button class="add-btn" onclick="openAdd()">+ Add</button>` : ''}
+  </div>`;
+  if (list.length === 0) {
+    html += `<div class="empty-state">${state.view === 'starred' ? 'Star items to build your essential set.' : 'Empty.'}</div>`;
+  } else {
+    list.forEach((it, i) => {
+      const current = i === state.currentIdx;
+      const fav = state.favorites.has(it.id);
+      const hasAudio = !!resolveAudioUrl(it);
+      const isLocal = it.id?.startsWith('local-');
+      html += `<div class="item ${current ? 'current' : ''}" onclick="selectIndex(${i})">
+        <div class="item-num">${i + 1}</div>
+        <div class="item-content">
+          ${it._category ? `<div class="item-cat">${escapeHtml(it._category)}</div>` : ''}
+          <div class="item-text">${escapeHtml(it.text)}</div>
+        </div>
+        <div class="item-icons">
+          ${hasAudio ? '<span class="has-audio-dot" title="Voice loaded"></span>' : ''}
+          ${fav ? '<span style="color:#d4a574;">★</span>' : ''}
+        </div>
+      </div>`;
+    });
+  }
+
+  main.innerHTML = html;
+}
+
+// Escape helpers
+function escapeHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function escapeAttr(s) { return escapeHtml(s); }
+
+// =========================================================================
+// MODALS
+// =========================================================================
+function openModal(html) {
+  const modals = $('modals');
+  modals.innerHTML = `<div class="modal-backdrop show" onclick="closeModal(event, true)">
+    <div class="modal" onclick="event.stopPropagation()">${html}</div>
+  </div>`;
+}
+function closeModal(e, isBackdrop) {
+  if (isBackdrop && e && e.target !== e.currentTarget) return;
+  $('modals').innerHTML = '';
+}
+
+function openConfig() {
+  openModal(`
+    <div class="modal-header">
+      <h3>Connection</h3>
+      <button class="close-btn" onclick="closeModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="field">
+      <label>Library URL</label>
+      <input type="text" id="cfgLibUrl" placeholder="https://raw.githubusercontent.com/.../library.json" value="${escapeAttr(state.config.libraryUrl || '')}">
+      <p class="field-help">Direct link to your <code>library.json</code>. Audio files referenced inside are loaded from the same folder.</p>
+    </div>
+    <div class="field">
+      <label class="field-row">
+        <input type="checkbox" id="cfgAuto" ${state.config.autoSync ? 'checked' : ''}>
+        Auto-sync when I open the app
+      </label>
+    </div>
+    <button class="btn" onclick="saveConfig()">Save & sync</button>
+  `);
+  setTimeout(() => $('cfgLibUrl').focus(), 100);
+}
+
+function saveConfig() {
+  state.config.libraryUrl = $('cfgLibUrl').value.trim();
+  state.config.autoSync = $('cfgAuto').checked;
+  persist();
+  closeModal();
+  if (state.config.libraryUrl) syncFromUrl();
+  else render();
+}
+
+function openSync() {
+  const lastSyncStr = state.lastSync ? new Date(state.lastSync).toLocaleString() : 'Never';
+  const buttonState = state.syncStatus === 'syncing' ? 'Syncing...'
+    : state.syncStatus === 'success' ? '✓ Synced'
+    : state.syncStatus === 'error' ? 'Failed — check URL'
+    : 'Sync now';
+  const errorHtml = state.syncError ? `<p class="field-help" style="color:#c95757;">${escapeHtml(state.syncError)}</p>` : '';
+  openModal(`
+    <div class="modal-header">
+      <h3>Sync</h3>
+      <button class="close-btn" onclick="closeModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <button class="btn" onclick="syncFromUrl(); closeModal();" ${!state.config.libraryUrl || state.syncStatus === 'syncing' ? 'disabled' : ''}>${buttonState}</button>
+    ${errorHtml}
+    <p class="field-help" style="text-align:center; margin-top: 10px;">Last sync: ${lastSyncStr}</p>
+    <button class="btn secondary" style="margin-top:14px;" onclick="closeModal(); openConfig();">Edit connection</button>
+  `);
+}
+
+function openSettings() {
+  const voiceOpts = state.voices.filter(v => v.lang.startsWith('en'))
+    .map(v => `<option value="${escapeAttr(v.voiceURI)}" ${v.voiceURI === state.settings.voiceURI ? 'selected' : ''}>${escapeHtml(v.name)}</option>`)
+    .join('');
+  openModal(`
+    <div class="modal-header">
+      <h3>Settings</h3>
+      <button class="close-btn" onclick="closeModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="field">
+      <label>Fallback TTS voice</label>
+      <select id="setVoice" onchange="state.settings.voiceURI = this.value; persist();">${voiceOpts}</select>
+      <p class="field-help">Used when an item has no cloned audio.</p>
+    </div>
+    <div class="field">
+      <label>Speed: <span id="rateLabel">${state.settings.rate.toFixed(2)}x</span></label>
+      <input type="range" min="0.5" max="1.5" step="0.05" value="${state.settings.rate}"
+        oninput="state.settings.rate = parseFloat(this.value); document.getElementById('rateLabel').textContent = state.settings.rate.toFixed(2) + 'x'; persist();">
+    </div>
+    <div class="field">
+      <label>Pause between: <span id="pauseLabel">${state.settings.pauseBetween.toFixed(1)}s</span></label>
+      <input type="range" min="0" max="5" step="0.1" value="${state.settings.pauseBetween}"
+        oninput="state.settings.pauseBetween = parseFloat(this.value); document.getElementById('pauseLabel').textContent = state.settings.pauseBetween.toFixed(1) + 's'; persist();">
+    </div>
+    <button class="btn secondary" onclick="clearAudioCache()">Clear audio cache</button>
+  `);
+}
+
+function openAdd() {
+  const cats = getCategories();
+  const opts = cats.map(c => `<option value="${escapeAttr(c)}" ${c === state.activeCategory ? 'selected' : ''}>${escapeHtml(c)}</option>`).join('');
+  openModal(`
+    <div class="modal-header">
+      <h3>Add affirmation</h3>
+      <button class="close-btn" onclick="closeModal()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="field">
+      <label>Category</label>
+      <select id="addCat">${opts}</select>
+    </div>
+    <div class="field">
+      <label>Text</label>
+      <textarea id="addText" placeholder="What do you want to hear yourself say?"></textarea>
+    </div>
+    <button class="btn" onclick="submitAdd()">Add</button>
+    <p class="field-help" style="margin-top:10px;">Local items use fallback TTS. To get them in your cloned voice, add to your master list and re-sync.</p>
+  `);
+  setTimeout(() => $('addText').focus(), 100);
+}
+function submitAdd() {
+  addLocalItem($('addCat').value, $('addText').value);
+  closeModal();
+}
+
+// =========================================================================
+// TRANSPORT TOGGLES
+// =========================================================================
+function toggleShuffle() { state.shuffle = !state.shuffle; render(); }
+function toggleLoop() { state.loop = !state.loop; render(); }
+
+// =========================================================================
+// INIT
+// =========================================================================
+function loadVoices() {
+  state.voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+  if (!state.settings.voiceURI && state.voices.length) {
+    const preferred = state.voices.find(v => v.lang.startsWith('en') && /Samantha|Alex|Daniel|Google US English|Microsoft/i.test(v.name))
+      || state.voices.find(v => v.lang.startsWith('en'))
+      || state.voices[0];
+    if (preferred) {
+      state.settings.voiceURI = preferred.voiceURI;
+      persist();
+    }
+  }
+}
+
+function init() {
+  // Initial category
+  const cats = getCategories();
+  state.activeCategory = cats[0] || null;
+
+  // Voices
+  loadVoices();
+  if (window.speechSynthesis) {
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+  }
+
+  // Wire up buttons
+  $('syncBtn').addEventListener('click', openSync);
+  $('settingsBtn').addEventListener('click', openSettings);
+
+  // Inject keyframes for sync spin animation
+  const sty = document.createElement('style');
+  sty.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+  document.head.appendChild(sty);
+
+  // MediaSession
+  setupMediaSessionHandlers();
+
+  // Render
+  render();
+
+  // Auto-sync
+  if (state.config.autoSync && state.config.libraryUrl) {
+    syncFromUrl();
+  }
+}
+
+// Expose handlers globally for inline onclick
+window.selectCategory = selectCategory;
+window.selectStarred = selectStarred;
+window.selectIndex = selectIndex;
+window.toggleFav = toggleFav;
+window.togglePlay = togglePlay;
+window.goNext = goNext;
+window.goPrev = goPrev;
+window.toggleShuffle = toggleShuffle;
+window.toggleLoop = toggleLoop;
+window.openConfig = openConfig;
+window.openSync = openSync;
+window.openSettings = openSettings;
+window.openAdd = openAdd;
+window.submitAdd = submitAdd;
+window.saveConfig = saveConfig;
+window.closeModal = closeModal;
+window.syncFromUrl = syncFromUrl;
+window.clearAudioCache = clearAudioCache;
+window.deleteItem = deleteItem;
+window.persist = persist;
+window.state = state;
+
+// Boot
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+</script>
+</body>
+</html>
