@@ -704,10 +704,9 @@ function stopPlayback() {
   if (audioElement) {
     try {
       audioElement.pause();
-      audioElement.removeAttribute('src');
-      audioElement.load();
     } catch {}
-    audioElement = null;
+    // Keep audioElement alive across plays so iOS treats subsequent plays
+    // as continuations of the original user gesture instead of new requests.
   }
   if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = null; }
   if (currentBlobUrl) { URL.revokeObjectURL(currentBlobUrl); currentBlobUrl = null; }
@@ -768,7 +767,8 @@ async function playCurrent() {
     try {
       const blobUrl = await fetchAudioBlobUrl(audioUrl);
       currentBlobUrl = blobUrl;
-      audioElement = new Audio(blobUrl);
+      if (!audioElement) audioElement = new Audio();
+      audioElement.src = blobUrl;
       audioElement.playbackRate = state.settings.rate;
       audioElement.onended = onDone;
       audioElement.onerror = (e) => {
@@ -794,6 +794,9 @@ function togglePlay() {
     render();
   } else {
     if (!getCurrentList().length) return;
+    // Prime the audio element synchronously inside the user gesture so iOS
+    // recognizes subsequent automatic plays as part of the same interaction.
+    if (!audioElement) audioElement = new Audio();
     state.isPlaying = true;
     render();
     playCurrent();
